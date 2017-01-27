@@ -1,5 +1,4 @@
 """ TODO: Put your header comment here """
-
 import random
 from PIL import Image
 
@@ -33,8 +32,10 @@ def evaluate_random_function(f, x, y):
         >>> evaluate_random_function(["y"],0.1,0.02)
         0.02
     """
-    # TODO: implement this
-    pass
+    if f[0] == "x":
+        return x
+    elif f[0] == "y":
+        return y
 
 
 def remap_interval(val,
@@ -63,9 +64,17 @@ def remap_interval(val,
         1.0
         >>> remap_interval(5, 4, 6, 1, 2)
         1.5
+        >>> remap_interval(350, 0, 350, -1, 1)
+        1.0
     """
-    # TODO: implement this
-    pass
+    if val is not None:
+        ratio = 1.0*(val - input_interval_start)
+        ratio = ratio / (input_interval_end - input_interval_start)
+        num = ratio * (output_interval_end - output_interval_start)
+        num += output_interval_start
+        return num
+    else:
+        return 0
 
 
 def color_map(val):
@@ -94,19 +103,18 @@ def test_image(filename, x_size=350, y_size=350):
 
         filename: string filename for image (should be .png)
         x_size, y_size: optional args to set image dimensions (default: 350)
+
     """
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
     pixels = im.load()
     for i in range(x_size):
         for j in range(y_size):
-            x = remap_interval(i, 0, x_size, -1, 1)
-            y = remap_interval(j, 0, y_size, -1, 1)
             pixels[i, j] = (random.randint(0, 255),  # Red channel
                             random.randint(0, 255),  # Green channel
                             random.randint(0, 255))  # Blue channel
-
     im.save(filename)
+    return 'saved'
 
 
 def generate_art(filename, x_size=350, y_size=350):
@@ -114,6 +122,7 @@ def generate_art(filename, x_size=350, y_size=350):
 
         filename: string filename for image (should be .png)
         x_size, y_size: optional args to set image dimensions (default: 350)
+
     """
     # Functions for red, green, and blue channels - where the magic happens!
     red_function = ["x"]
@@ -132,8 +141,8 @@ def generate_art(filename, x_size=350, y_size=350):
                     color_map(evaluate_random_function(green_function, x, y)),
                     color_map(evaluate_random_function(blue_function, x, y))
                     )
-
     im.save(filename)
+    return 'saved'
 
 
 if __name__ == '__main__':
@@ -148,3 +157,4 @@ if __name__ == '__main__':
     # Test that PIL is installed correctly
     # TODO: Comment or remove this function call after testing PIL install
     test_image("noise.png")
+    generate_art("green_pink.png", 350, 350)
