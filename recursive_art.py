@@ -1,5 +1,6 @@
 """ TODO: Put your header comment here """
 import random
+import math
 from PIL import Image
 
 
@@ -14,8 +15,49 @@ def build_random_function(min_depth, max_depth):
                  (see assignment writeup for details on the representation of
                  these functions)
     """
-    # TODO: implement this
-    pass
+    first_order = ['x', 'y']
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    if min_depth == 0:
+        ls = []
+        ls.append(first_order[random.randint(0, 1)])
+        return ls
+    else:
+        rand = random.randint(0, len(elementary_func)-1)
+        begin = elementary_func[rand]
+        arguments = [begin]
+        arguments.append(build_random_function(min_depth-1, max_depth-1))
+        if rand < 2:
+            arguments.append(build_random_function(min_depth-1, max_depth-1))
+        to_return = [begin]
+        to_return.append(arguments)
+        return arguments
+
+
+def r_lambda_func(depth):
+    """ Builds a random function of depth 'depth'
+
+        depth: the minimum depth of the random function
+        returns: the randomly generated lambda function
+    """
+    first_order = [lambda x, y: x, lambda x, y: y]
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    if depth == 0:
+        rand = random.randint(0, 1)
+        if rand == 0:
+            return lambda x, y: x
+        else:
+            return lambda x, y: y
+    else:
+        rand = random.randint(0, len(elementary_func))
+        rand = 1
+        if rand == 0:
+            return lambda x, y: (r_lambda_func(depth-1)(x, y)) * (r_lambda_func(depth-1)(x, y))
+        elif rand == 1:
+            return lambda x, y: .5 * ((r_lambda_func(depth-1)(x, y) + r_lambda_func(depth-1)(x, y)))(x, y)
+        elif rand == 2:
+            return lambda x, y: math.cos(lambda x, y: math.pi(x, y) * r_lambda_func(depth-1)(x, y))(x, y)
+        elif rand == 3:
+            return lambda x, y: math.sin(lambda x, y: math.pi(x, y) * r_lambda_func(depth-1)(x, y))(x, y)
 
 
 def evaluate_random_function(f, x, y):
@@ -32,10 +74,28 @@ def evaluate_random_function(f, x, y):
         >>> evaluate_random_function(["y"],0.1,0.02)
         0.02
     """
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
     if f[0] == "x":
         return x
     elif f[0] == "y":
         return y
+    else:
+        if f[0] == elementary_func[0]:
+            first_argument = evaluate_random_function(f[1], x, y)
+            second_argument = evaluate_random_function(f[2], x, y)
+            return first_argument * second_argument
+        elif f[0] == elementary_func[1]:
+            first_argument = evaluate_random_function(f[1], x, y)
+            second_argument = evaluate_random_function(f[2], x, y)
+            return .5*(first_argument + second_argument)
+        elif f[0] == elementary_func[2]:
+            argument = evaluate_random_function(f[1], x, y)
+            ans = math.cos(math.pi * argument)
+            return ans
+        elif f[0] == elementary_func[3]:
+            argument = evaluate_random_function(f[1], x, y)
+            ans = math.sin(math.pi * argument)
+            return ans
 
 
 def remap_interval(val,
@@ -125,9 +185,12 @@ def generate_art(filename, x_size=350, y_size=350):
 
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = ["x"]
-    green_function = ["y"]
-    blue_function = ["x"]
+    r_lb = random.randint(1, 5)
+    g_lb = random.randint(1, 10)
+    b_lb = random.randint(1, 5)
+    red_function = build_random_function(r_lb, r_lb+1)
+    green_function = build_random_function(g_lb, g_lb+1)
+    blue_function = build_random_function(b_lb, b_lb+1)
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
@@ -145,6 +208,42 @@ def generate_art(filename, x_size=350, y_size=350):
     return 'saved'
 
 
+def generate_lambda_art(filename, x_size=350, y_size=350):
+    """ Generate computational art and save as an image file.
+
+        filename: string filename for image (should be .png)
+        x_size, y_size: optional args to set image dimensions (default: 350)
+
+    """
+    # Functions for red, green, and blue channels - where the magic happens!
+    r_lb = random.randint(1, 2)
+    g_lb = random.randint(1, 2)
+    b_lb = random.randint(1, 2)
+    red_function = r_lambda_func(1)
+    green_function = r_lambda_func(1)
+    blue_function = r_lambda_func(1)
+    print(red_function)
+    print(red_function)
+    print(red_function(0.0, 1.0))
+    print(red_function(1.0, 0.05))
+    print(red_function(1.0, 0.0))
+
+    # Create image and loop over all pixels
+    im = Image.new("RGB", (x_size, y_size))
+    pixels = im.load()
+    for i in range(x_size):
+        for j in range(y_size):
+            x = remap_interval(i, 0, x_size, -1, 1)
+            y = remap_interval(j, 0, y_size, -1, 1)
+            pixels[i, j] = (
+                    color_map(red_function(x, y)),
+                    color_map(green_function(x, y)),
+                    color_map(blue_function(x, y))
+                    )
+    im.save(filename)
+    return 'saved'
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
@@ -156,5 +255,12 @@ if __name__ == '__main__':
 
     # Test that PIL is installed correctly
     # TODO: Comment or remove this function call after testing PIL install
-    test_image("noise.png")
-    generate_art("green_pink.png", 350, 350)
+    # test_image("noise.png")
+    # print(build_random_function(6, 9))
+    generate_lambda_art('FirstLambda.png')
+    """
+    name = 'run_six_'
+    for i in range(10):
+        title = name + str(i) + '.png'
+        generate_art(title, 1920, 1080)
+    """
