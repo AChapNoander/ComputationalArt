@@ -1,4 +1,9 @@
-""" TODO: Put your header comment here """
+"""
+ Project 2: Recursively Generated Art
+ Alex Chapman
+ 1/30/17
+
+"""
 import random
 import math
 from PIL import Image
@@ -28,6 +33,35 @@ def build_random_function(min_depth, max_depth):
         arguments.append(build_random_function(min_depth-1, max_depth-1))
         if rand < 2:
             arguments.append(build_random_function(min_depth-1, max_depth-1))
+        to_return = [begin]
+        to_return.append(arguments)
+        return arguments
+
+
+def build_random_function_3(min_depth, max_depth):
+    """ Builds a random function of depth at least min_depth and depth
+        at most max_depth (see assignment writeup for definition of depth
+        in this context)
+
+        min_depth: the minimum depth of the random function
+        max_depth: the maximum depth of the random function
+        returns: the randomly generated function represented as a nested list
+                 (see assignment writeup for details on the representation of
+                 these functions)
+    """
+    first_order = ['x', 'y', 't']
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    if min_depth == 0:
+        ls = []
+        ls.append(first_order[random.randint(0, 2)])
+        return ls
+    else:
+        rand = random.randint(0, len(elementary_func)-1)
+        begin = elementary_func[rand]
+        arguments = [begin]
+        arguments.append(build_random_function_3(min_depth-1, max_depth-1))
+        if rand < 2:
+            arguments.append(build_random_function_3(min_depth-1, max_depth-1))
         to_return = [begin]
         to_return.append(arguments)
         return arguments
@@ -94,6 +128,46 @@ def evaluate_random_function(f, x, y):
             return ans
         elif f[0] == elementary_func[3]:
             argument = evaluate_random_function(f[1], x, y)
+            ans = math.sin(math.pi * argument)
+            return ans
+
+
+def eval_r_func_3(f, x, y, t):
+    """ Evaluate the random function f with inputs x,y
+        Representation of the function f is defined in the assignment writeup
+
+        f: the function to evaluate
+        x: the value of x to be used to evaluate the function
+        y: the value of y to be used to evaluate the function
+        returns: the function value
+
+        >>> evaluate_random_function(["x"],-0.5, 0.75)
+        -0.5
+        >>> evaluate_random_function(["y"],0.1,0.02)
+        0.02
+    """
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    if f[0] == "x":
+        return x
+    elif f[0] == "y":
+        return y
+    elif f[0] == "t":
+        return t
+    else:
+        if f[0] == elementary_func[0]:
+            first_argument = eval_r_func_3(f[1], x, y, t)
+            second_argument = eval_r_func_3(f[2], x, y, t)
+            return first_argument * second_argument
+        elif f[0] == elementary_func[1]:
+            first_argument = eval_r_func_3(f[1], x, y, t)
+            second_argument = eval_r_func_3(f[2], x, y, t)
+            return .5*(first_argument + second_argument)
+        elif f[0] == elementary_func[2]:
+            argument = eval_r_func_3(f[1], x, y, t)
+            ans = math.cos(math.pi * argument)
+            return ans
+        elif f[0] == elementary_func[3]:
+            argument = eval_r_func_3(f[1], x, y, t)
             ans = math.sin(math.pi * argument)
             return ans
 
@@ -244,6 +318,41 @@ def generate_lambda_art(filename, x_size=350, y_size=350):
     return 'saved'
 
 
+def generate_art_3(filename, x_size=350, y_size=350, t_size=30):
+    """ Generate computational art and save as a series of image files.
+
+        filename: string base filename for image (should be .png)
+        x_size, y_size: optional args to set image dimensions (default: 350)
+        t_size: optional arg for setting num of frames, default 30
+    """
+    # Functions for red, green, and blue channels - where the magic happens!
+    r_lb = random.randint(1, 5)
+    g_lb = random.randint(1, 10)
+    b_lb = random.randint(1, 5)
+    red_function = build_random_function_3(r_lb, r_lb+1)
+    green_function = build_random_function_3(g_lb, g_lb+1)
+    blue_function = build_random_function_3(b_lb, b_lb+1)
+
+    # Create image and loop over all pixels
+    im = Image.new("RGB", (x_size, y_size))
+    pixels = im.load()
+    for time in range(t_size):
+        for i in range(x_size):
+            for j in range(y_size):
+                t = remap_interval(time, 0, t_size, -1, 1)
+                x = remap_interval(i, 0, x_size, -1, 1)
+                y = remap_interval(j, 0, y_size, -1, 1)
+                pixels[i, j] = (
+                        color_map(eval_r_func_3(red_function, x, y, t)),
+                        color_map(eval_r_func_3(green_function, x, y, t)),
+                        color_map(eval_r_func_3(blue_function, x, y, t))
+                    )
+        str_num = '0' * (5 - len(str(time))) + str(time)
+        print(str_num)
+        im.save('image' + str_num + '.png')
+    return 'saved'
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
@@ -257,10 +366,12 @@ if __name__ == '__main__':
     # TODO: Comment or remove this function call after testing PIL install
     # test_image("noise.png")
     # print(build_random_function(6, 9))
-    generate_lambda_art('FirstLambda.png')
+    # generate_lambda_art('FirstLambda.png')
+    print(build_random_function_3(3, 4))
+    generate_art_3('frame.png', 350, 350, 100)
     """
-    name = 'run_six_'
+    name = 'wallpaper_'
     for i in range(10):
         title = name + str(i) + '.png'
-        generate_art(title, 1920, 1080)
+        generate_art(title, 1334, 750)
     """
