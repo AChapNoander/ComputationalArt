@@ -321,7 +321,7 @@ def generate_lambda_art(filename, x_size=350, y_size=350):
 def generate_art_3(filename, x_size=350, y_size=350, t_size=30):
     """ Generate computational art and save as a series of image files.
 
-        filename: string base filename for image (should be .png)
+        filename: string base filename for image (should NOT be .png)
         x_size, y_size: optional args to set image dimensions (default: 350)
         t_size: optional arg for setting num of frames, default 30
     """
@@ -349,7 +349,7 @@ def generate_art_3(filename, x_size=350, y_size=350, t_size=30):
                     )
         str_num = '0' * (5 - len(str(time))) + str(time)
         print(str_num)
-        im.save('image' + str_num + '.png')
+        im.save(filename + str_num + '.png')
     return 'saved'
 
 
@@ -368,7 +368,7 @@ if __name__ == '__main__':
     # print(build_random_function(6, 9))
     # generate_lambda_art('FirstLambda.png')
     print(build_random_function_3(3, 4))
-    generate_art_3('frame.png', 350, 350, 100)
+    generate_art_3('1image', 700, 700, 100)
     """
     name = 'wallpaper_'
     for i in range(10):
