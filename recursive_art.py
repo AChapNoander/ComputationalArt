@@ -21,7 +21,7 @@ def build_random_function(min_depth, max_depth):
                  these functions)
     """
     first_order = ['x', 'y']
-    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi', 'square', 'root']
     if min_depth == 0:
         ls = []
         ls.append(first_order[random.randint(0, 1)])
@@ -50,7 +50,7 @@ def build_random_function_3(min_depth, max_depth):
                  these functions)
     """
     first_order = ['x', 'y', 't']
-    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi', 'square', 'root']
     if min_depth == 0:
         ls = []
         ls.append(first_order[random.randint(0, 2)])
@@ -108,7 +108,7 @@ def evaluate_random_function(f, x, y):
         >>> evaluate_random_function(["y"],0.1,0.02)
         0.02
     """
-    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
+    elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi', 'square', 'root']
     if f[0] == "x":
         return x
     elif f[0] == "y":
@@ -130,6 +130,12 @@ def evaluate_random_function(f, x, y):
             argument = evaluate_random_function(f[1], x, y)
             ans = math.sin(math.pi * argument)
             return ans
+        elif f[0] == elementary_func[4]:
+            argument = evaluate_random_function(f[1], x, y)
+            return argument**2
+        elif f[0] == elementary_func[5]:
+            argument = evaluate_random_function(f[1], x, y)
+            return math.sqrt(math.fabs(argument))
 
 
 def eval_r_func_3(f, x, y, t):
@@ -259,9 +265,9 @@ def generate_art(filename, x_size=350, y_size=350):
 
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    r_lb = random.randint(1, 5)
-    g_lb = random.randint(1, 10)
-    b_lb = random.randint(1, 5)
+    r_lb = random.randint(6, 10)
+    g_lb = random.randint(6, 10)
+    b_lb = random.randint(6, 10)
     red_function = build_random_function(r_lb, r_lb+1)
     green_function = build_random_function(g_lb, g_lb+1)
     blue_function = build_random_function(b_lb, b_lb+1)
@@ -278,7 +284,7 @@ def generate_art(filename, x_size=350, y_size=350):
                     color_map(evaluate_random_function(green_function, x, y)),
                     color_map(evaluate_random_function(blue_function, x, y))
                     )
-    im.save(filename)
+    im.save(filename+'.png')
     return 'saved'
 
 
@@ -356,19 +362,7 @@ def generate_art_3(filename, x_size=350, y_size=350, t_size=30):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-
-    # Create some computational art!
-    # TODO: Un-comment the generate_art function call after you
-    #       implement remap_interval and evaluate_random_function
-    # generate_art("myart.png")
-
-    # Test that PIL is installed correctly
-    # TODO: Comment or remove this function call after testing PIL install
-    # test_image("noise.png")
-    # print(build_random_function(6, 9))
-    # generate_lambda_art('FirstLambda.png')
-    print(build_random_function_3(3, 4))
-    generate_art_3('1image', 700, 700, 100)
+    generate_art('Background', 1920, 1080)
     """
     name = 'wallpaper_'
     for i in range(10):
