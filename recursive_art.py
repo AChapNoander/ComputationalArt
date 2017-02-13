@@ -2,7 +2,9 @@
  Project 2: Recursively Generated Art
  Alex Chapman
  1/30/17
-
+ Made it through both extra extensions. Microphone response is seen in the
+ python file microphone_implementation in the file microphone_response
+ Movie is saved under the name Movie_3
 """
 import random
 import math
@@ -22,6 +24,9 @@ def build_random_function(min_depth, max_depth):
     """
     first_order = ['x', 'y']
     elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi', 'square', 'root']
+
+    # Base Case. can say == instead of <= because min depth is only ever
+    # decreased by 1
     if min_depth == 0:
         ls = []
         ls.append(first_order[random.randint(0, 1)])
@@ -31,23 +36,25 @@ def build_random_function(min_depth, max_depth):
         begin = elementary_func[rand]
         arguments = [begin]
         arguments.append(build_random_function(min_depth-1, max_depth-1))
+
+        # Establishes a second argument for the functions which need two
         if rand < 2:
             arguments.append(build_random_function(min_depth-1, max_depth-1))
-        to_return = [begin]
-        to_return.append(arguments)
         return arguments
 
 
 def build_random_function_3(min_depth, max_depth):
     """ Builds a random function of depth at least min_depth and depth
-        at most max_depth (see assignment writeup for definition of depth
-        in this context)
+        at most max_depth with three parameters, x, y, and t. Allows for
+        movie style representation.
 
         min_depth: the minimum depth of the random function
         max_depth: the maximum depth of the random function
         returns: the randomly generated function represented as a nested list
                  (see assignment writeup for details on the representation of
                  these functions)
+
+        ESSENTIALLY THE SAME AS build_random_function
     """
     first_order = ['x', 'y', 't']
     elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi', 'square', 'root']
@@ -69,9 +76,12 @@ def build_random_function_3(min_depth, max_depth):
 
 def r_lambda_func(depth):
     """ Builds a random function of depth 'depth'
+        Ultimately failed to fully implement lambda functions. :(
 
         depth: the minimum depth of the random function
         returns: the randomly generated lambda function
+
+        if u have any ideas pls help
     """
     first_order = [lambda x, y: x, lambda x, y: y]
     elementary_func = ['prod', 'avg', 'cos_pi', 'sin_pi']
@@ -113,6 +123,9 @@ def evaluate_random_function(f, x, y):
         return x
     elif f[0] == "y":
         return y
+
+    # Kindof effort instensive way to do this, but it allows for a
+    # changeable list of functions with less effort
     else:
         if f[0] == elementary_func[0]:
             first_argument = evaluate_random_function(f[1], x, y)
@@ -139,7 +152,7 @@ def evaluate_random_function(f, x, y):
 
 
 def eval_r_func_3(f, x, y, t):
-    """ Evaluate the random function f with inputs x,y
+    """ Evaluate the random function f with inputs x,y,t
         Representation of the function f is defined in the assignment writeup
 
         f: the function to evaluate
@@ -208,6 +221,7 @@ def remap_interval(val,
         1.0
     """
     if val is not None:
+        # make sure it stays as a float
         ratio = 1.0*(val - input_interval_start)
         ratio = ratio / (input_interval_end - input_interval_start)
         num = ratio * (output_interval_end - output_interval_start)
@@ -290,6 +304,8 @@ def generate_art(filename, x_size=350, y_size=350):
 
 def generate_lambda_art(filename, x_size=350, y_size=350):
     """ Generate computational art and save as an image file.
+
+        Attempted. Failed. :(
 
         filename: string filename for image (should be .png)
         x_size, y_size: optional args to set image dimensions (default: 350)
